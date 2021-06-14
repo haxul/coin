@@ -10,6 +10,19 @@ describe("Blockchain", () => {
         bc2 = new Blockchain()
     })
 
+    it ("does not replace the chain with length equal or less",() => {
+        bc.addBlock("foo")
+        bc.replaceChain(bc2.chain)
+        expect(bc.chain).not.toEqual(bc2.chain)
+    })
+
+    it("replaces chain with valid chain", () => {
+        bc2.addBlock("google")
+        bc.replaceChain(bc2.chain)
+
+        expect(bc.chain).toEqual(bc2.chain)
+    })
+
     it("validates a valid chain", () => {
         bc2.addBlock("foo")
         expect(bc.isValidChain(bc2.chain)).toBe(true)

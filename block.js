@@ -33,6 +33,11 @@ class Block {
     static buildHash(timestamp, lastHash, data) {
         return SHA256(`${timestamp}${lastHash}${data}`).toString()
     }
+
+    static buildHashFromBlock(block) {
+        const {timestamp, lastHash, data} = block
+        return Block.buildHash(timestamp,lastHash,data)
+    }
 }
 
 

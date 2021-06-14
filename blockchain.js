@@ -14,10 +14,9 @@ class Blockchain {
     }
 
     isValidChain(chain) {
-        if (JSON.stringify(chain[0]) !== JSON.stringify(Block.genesis())) {
-            return false
-        }
-
+        const inputFirstBlock = JSON.stringify(chain[0])
+        const originGenesisBlock = JSON.stringify(Block.genesis())
+        if (inputFirstBlock !== originGenesisBlock) return false
         for (let i = 1; i < chain.length; i++) {
             const block = chain[i]
             const lastBlock = chain[i - 1]

@@ -18,5 +18,6 @@ app.post("/mine", (req, res) => {
     res.redirect("/blocks")
 })
 
+
 app.listen(3001, () => console.log(`server starts on port ${HTTP_PORT}`))
 

@@ -1,3 +1,6 @@
-const Block = require("./blockchain/block")
+const Blockchain = require("./blockchain")
+const bc = new Blockchain()
 
-const block = new Block("foo", "bar", "zoo", "baz")
+for (let i = 0; i < 10; i++) {
+    console.log(bc.addBlock(`foo${i}`))
+}

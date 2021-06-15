@@ -1,9 +1,13 @@
 const express = require("express")
 const bodyParser = require("body-parser")
-const Blockchain = require("../blockchain")
 const HTTP_PORT = process.env.HTTP_PORT || 3001
 const app = express()
+
+const Blockchain = require("../blockchain")
 const blockchain = new Blockchain()
+
+const P2PServer = require("./p2p-server")
+const p2pServer = new P2PServer(blockchain)
 
 app.use(bodyParser.json())
 
@@ -18,6 +22,5 @@ app.post("/mine", (req, res) => {
     res.redirect("/blocks")
 })
 
-
-app.listen(3001, () => console.log(`server starts on port ${HTTP_PORT}`))
-
+app.listen(HTTP_PORT, () => console.log(`server starts on port ${HTTP_PORT}`))
+p2pServer.listen()

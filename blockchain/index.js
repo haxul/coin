@@ -34,11 +34,11 @@ class Index {
         }
 
         if (!this.isValidChain(newChain)) {
-            console.log("reveived chain is not valid")
+            console.log("received chain is not valid")
             return
         }
 
-        console.log("Replcing blockchain with new chain.")
+        console.log("Replacing blockchain with new chain.")
         this.chain = newChain
     }
 }

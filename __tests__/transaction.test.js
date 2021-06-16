@@ -32,4 +32,12 @@ describe("Transaction", () => {
         expect(transaction.input.amount).toEqual(wallet.balance)
     })
 
+    it("validates a valid transaction", () => {
+        expect(Transaction.verifyTransaction(transaction)).toBe(true)
+    })
+
+    it("invalidates a not valid transaction", () => {
+        transaction.outputs[0].amount = 5000000
+        expect(Transaction.verifyTransaction(transaction)).toBe(false)
+    })
 })

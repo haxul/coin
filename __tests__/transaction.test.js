@@ -12,6 +12,30 @@ describe("Transaction", () => {
         transaction = Transaction.newTransaction(wallet, recipient, amount)
     })
 
+    it("not allowed to update when it is not enough money in the wallet", () => {
+        const nextAmount = 200000000
+        const nextRecipient = "!!!!!!"
+        transaction.update(wallet, nextRecipient, nextAmount)
+        expect(transaction.outputs.find(out => out.address === wallet.publicKey).amount)
+            .toEqual(wallet.balance - amount)
+    })
+
+    it("update a transaction", () => {
+        const nextAmount = 20
+        const nextRecipient = "!!!!!!"
+        transaction.update(wallet, nextRecipient, nextAmount)
+        expect(transaction.outputs.find(out => out.address === wallet.publicKey).amount)
+            .toEqual(wallet.balance - amount - nextAmount)
+    })
+
+    it("update a transaction", () => {
+        const nextAmount = 20
+        const nextRecipient = "!!!!!!"
+        transaction.update(wallet, nextRecipient, nextAmount)
+        expect(transaction.outputs.find(out => out.address === nextRecipient).amount)
+            .toEqual(nextAmount)
+    })
+
     it("outputs the `amount` subtracted from the wallet balance", () => {
         expect(transaction.outputs.find(out => out.address === wallet.publicKey).amount)
             .toEqual(wallet.balance - amount)

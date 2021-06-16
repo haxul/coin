@@ -8,6 +8,20 @@ class Transaction {
         this.outputs = []
     }
 
+    update(senderWallet, recipient, amount) {
+        const senderOutput = this.outputs
+            .find((out => out.address === senderWallet.publicKey))
+        if (amount > senderOutput.amount) {
+            console.log(`amount: ${amount} exceeds balance.`)
+            return
+        }
+        senderOutput.amount = senderOutput.amount - amount
+        this.outputs.push({amount, address: recipient})
+        Transaction.signTransaction(this, senderWallet)
+
+        return this
+    }
+
     static newTransaction(senderWallet, recipientAddress, amount) {
         const transaction = new Transaction()
         if (amount > senderWallet.balance) {
@@ -38,7 +52,7 @@ class Transaction {
     }
 
     static verifyTransaction(transaction) {
-       return ChainUtil.verifySignature(
+        return ChainUtil.verifySignature(
             transaction.input.address,
             transaction.input.signature,
             ChainUtil.hash(transaction.outputs)

@@ -6,8 +6,8 @@
   "scripts": {
     "test": "jest --watchAll",
     "dev-test": "node dev-test.js",
-    "start": "node ./app",
-    "dev": "nodemon ./app"
+    "start": "node app",
+    "dev": "nodemon app"
   },
   "keywords": [],
   "author": "",

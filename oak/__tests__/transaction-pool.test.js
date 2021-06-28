@@ -1,5 +1,5 @@
 const TransactionPool = require("../wallet/transaction-pool")
-const Wallet = require("../wallet/index")
+const Wallet = require("../wallet")
 const Transaction = require("../wallet/transaction")
 const Blockchain = require("../blockchain")
 

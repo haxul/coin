@@ -10,13 +10,14 @@ class Block(
     var data: Any
 ) {
     companion object {
-        fun getGenesisBlock(): Block {
-            return Block(
-                GenesisData.timestamp,
-                GenesisData.lastHash,
-                GenesisData.hash,
-                GenesisData.data
-            )
-        }
+        val GENESIS_BLOCK: Block = Block(
+            GenesisData.TIMESTAMP,
+            GenesisData.LAST_HASH,
+            GenesisData.HASH,
+            GenesisData.DATA
+        )
     }
+
+    override fun toString(): String = "Block(timestamp:$timestamp,lastHash:$lastHash,hash:$hash,data:$data)"
+
 }

@@ -1,8 +1,0 @@
-{
-  "extends": [],
-  "jsRules": {},
-  "rules": {
-    "trailing-comma": [ false ]
-  },
-  "rulesDirectory": []
-}

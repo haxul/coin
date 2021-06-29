@@ -7,6 +7,11 @@ export interface BlockAble {
     data: any
 }
 
+export interface MineAbleData {
+    lastBlock: Block
+    data: any
+}
+
 class Block {
 
     timestamp: number
@@ -35,6 +40,14 @@ class Block {
         lastHash: GENESIS_DATA.lastHash
     });
 
+    public static mineBlock = ({lastBlock, data}: MineAbleData): Block => {
+        return new Block({
+            timestamp: Date.now(),
+            lastHash: lastBlock.hash,
+            hash: "new hash //TODO later",
+            data
+        })
+    }
 }
 
 export default Block

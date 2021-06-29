@@ -1,3 +1,5 @@
+import {GENESIS_DATA} from "./config";
+
 export interface BlockAble {
     timestamp: number
     lastHash: string
@@ -5,7 +7,7 @@ export interface BlockAble {
     data: any
 }
 
-export class Block {
+class Block {
 
     timestamp: number
     lastHash: string
@@ -26,4 +28,13 @@ export class Block {
        hash: ${this.hash},
        data: ${this.data}
     `
+    public static getGenesis = (): Block => new Block({
+        timestamp: GENESIS_DATA.timestamp,
+        data: GENESIS_DATA.data,
+        hash: GENESIS_DATA.hash,
+        lastHash: GENESIS_DATA.lastHash
+    });
+
 }
+
+export default Block

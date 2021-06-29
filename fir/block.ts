@@ -1,11 +1,18 @@
-class Block {
+export interface BlockAble {
+    timestamp: number
+    lastHash: string
+    hash: string
+    data: any
+}
+
+export class Block {
 
     timestamp: number
     lastHash: string
     hash: string
     data: any
 
-    constructor(timestamp: number, lastHash: string, hash: string, data: any) {
+    constructor({timestamp, lastHash, hash, data}: BlockAble) {
         this.timestamp = timestamp
         this.lastHash = lastHash
         this.hash = hash
@@ -20,5 +27,3 @@ class Block {
        data: ${this.data}
     `
 }
-
-export default Block

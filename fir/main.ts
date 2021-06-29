@@ -1,6 +1,5 @@
 import {Request, Response} from "express"
 import express from "express"
-import Block from "./block";
 
 const app = express()
 const port = 8080

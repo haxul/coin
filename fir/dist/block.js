@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Block {
-    constructor(timestamp, lastHash, hash, data) {
+    constructor({ timestamp, lastHash, hash, data }) {
         this.toString = () => `
     Block:
        timestamp: ${this.timestamp},
@@ -15,7 +15,7 @@ class Block {
         this.data = data;
     }
 }
-const b = new Block(12, "df", "a", "a");
+const b = new Block({ timestamp: 12, data: [], hash: "", lastHash: "" });
 console.log(b.toString());
 exports.default = Block;
 //# sourceMappingURL=block.js.map

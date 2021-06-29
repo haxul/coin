@@ -7,7 +7,7 @@ class Block(
     val timestamp: LocalDateTime,
     val lastHash: String,
     val hash: String,
-    var data: Any
+    val data: Any
 ) {
     companion object {
         val GENESIS_BLOCK: Block = Block(

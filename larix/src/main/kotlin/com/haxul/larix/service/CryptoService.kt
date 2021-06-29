@@ -1,5 +1,6 @@
 package com.haxul.larix.service
 
+import com.haxul.larix.model.Block
 import org.springframework.stereotype.Service
 import java.security.MessageDigest
 
@@ -19,4 +20,7 @@ class CryptoService {
         }
         return hexSb.toString()
     }
+
+    fun cryptoHash(block: Block): String =
+        cryptoHash(block.timestamp.toString(), block.lastHash, block.data.toString())
 }

@@ -1,6 +1,5 @@
 import Block from "../block";
 import {GENESIS_DATA} from "../config";
-import {inspect} from "util";
 
 describe("Block", () => {
     const timestamp = 123

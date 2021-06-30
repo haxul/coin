@@ -10,11 +10,11 @@ import java.time.ZoneOffset
 class BlockService(val cryptoService: CryptoService) {
 
     fun mineBlock(lastBlock: Block, data: Any): Block {
-        val difficultyValue: Int = if (lastBlock.difficulty <= 0) 1 else lastBlock.difficulty
+        val difficultyValue: Int = if (lastBlock.difficulty <= 1) 1 else lastBlock.difficulty
         var timestamp: LocalDateTime
         var nonce = 0
         var curDifficulty: Int
-        var hash = ""
+        var hash: String
         do {
             nonce++
             timestamp = LocalDateTime.now()
@@ -40,7 +40,7 @@ class BlockService(val cryptoService: CryptoService) {
 
     fun computeDifficulty(lastBlock: Block, curTime: LocalDateTime): Int {
         val difficulty: Int = lastBlock.difficulty
-        if (difficulty <= 0) return 1
+        if (difficulty <= 1) return 1
         val lastBlockEpoch: Long = lastBlock.timestamp.toEpochSecond(ZoneOffset.UTC)
         val curEpoch: Long = curTime.toEpochSecond(ZoneOffset.UTC)
         return if (lastBlockEpoch + MiningConfig.MINE_RATE > curEpoch) difficulty + 1 else difficulty - 1

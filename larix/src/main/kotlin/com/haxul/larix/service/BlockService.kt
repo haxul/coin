@@ -8,11 +8,11 @@ import java.time.LocalDateTime
 class BlockService(val cryptoService: CryptoService) {
 
     fun mineBlock(lastBlock: Block, data: Any): Block {
-        var timestamp: LocalDateTime = LocalDateTime.now()
+        var timestamp: LocalDateTime
         var nonce = 0
         val difficulty = lastBlock.difficulty
         var hash = ""
-        while (!hash.startsWith("0".repeat(difficulty))) {
+        do {
             nonce++
             timestamp = LocalDateTime.now()
             hash = cryptoService
@@ -23,7 +23,8 @@ class BlockService(val cryptoService: CryptoService) {
                     nonce.toString(),
                     difficulty.toString()
                 )
-        }
+        } while (!hash.startsWith("0".repeat(difficulty)))
+
 
         return Block(
             timestamp = timestamp,

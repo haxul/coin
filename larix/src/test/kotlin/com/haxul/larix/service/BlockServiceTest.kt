@@ -17,7 +17,8 @@ class BlockServiceTest(
     val cryptoService: CryptoService
 ) {
 
-    val lastBlock: Block = Block(LocalDateTime.now(), "helloworld", "world", emptyList<Any>(), GenesisData.NONCE, GenesisData.DIFFICULTY)
+    val lastBlock: Block =
+        Block(LocalDateTime.now(), "helloworld", "world", emptyList<Any>(), GenesisData.NONCE, GenesisData.DIFFICULTY)
     val data = listOf("Hello", "World")
 
     @Test
@@ -50,5 +51,19 @@ class BlockServiceTest(
     fun `when call mineBlock then it fits mining criteria`() {
         val minedBlock: Block = blockService.mineBlock(lastBlock, data)
         assertTrue(minedBlock.hash.startsWith("0".repeat(GenesisData.DIFFICULTY)))
+    }
+
+    @Test
+    fun `when compare two identical genesis block then they are equal`() {
+        val block = Block(
+            Block.GENESIS_BLOCK.timestamp,
+            Block.GENESIS_BLOCK.lastHash,
+            Block.GENESIS_BLOCK.hash,
+            Block.GENESIS_BLOCK.data,
+            Block.GENESIS_BLOCK.nonce,
+            Block.GENESIS_BLOCK.difficulty
+        )
+
+        assertTrue(block == Block.GENESIS_BLOCK)
     }
 }

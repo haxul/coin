@@ -24,4 +24,11 @@ class Block(
 
     override fun toString(): String = "Block(timestamp:$timestamp,lastHash:$lastHash,hash:$hash,data:$data)"
 
+    override fun equals(other: Any?) = (other is Block)
+            && timestamp == other.timestamp
+            && lastHash == other.lastHash
+            && hash == other.hash
+            && data == other.data
+            && nonce == other.nonce
+            && difficulty == other.difficulty
 }

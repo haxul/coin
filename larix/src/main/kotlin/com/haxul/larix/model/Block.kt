@@ -7,14 +7,18 @@ class Block(
     val timestamp: LocalDateTime,
     val lastHash: String,
     val hash: String,
-    val data: Any
+    val data: Any,
+    val nonce: Int,
+    val difficulty:Int
 ) {
     companion object {
         val GENESIS_BLOCK: Block = Block(
             GenesisData.TIMESTAMP,
             GenesisData.LAST_HASH,
             GenesisData.HASH,
-            GenesisData.DATA
+            GenesisData.DATA,
+            GenesisData.NONCE,
+            GenesisData.DIFFICULTY
         )
     }
 

@@ -18,6 +18,7 @@ class BlockchainServiceTest(
 
     lateinit var blockchain: Blockchain
     lateinit var data: String
+    lateinit var anotherBlockchain: Blockchain
 
     @BeforeEach
     fun setup() {
@@ -25,6 +26,8 @@ class BlockchainServiceTest(
         blockchainService.addBlock(blockchain, listOf("hello"))
         blockchainService.addBlock(blockchain, listOf("world"))
         blockchainService.addBlock(blockchain, listOf("!!!"))
+
+        anotherBlockchain = Blockchain()
 
         data = "important data"
     }
@@ -42,7 +45,7 @@ class BlockchainServiceTest(
 
     @Test
     fun `given the blockchain does not start with the genesis block when call isValidBlockchain() then returns false`() {
-        blockchain.chain[0] = Block(LocalDateTime.now(), "fake", "fake", emptyList<Any>())
+        blockchain.chain[0] = Block(LocalDateTime.now(), "fake", "fake", emptyList<Any>(), 0, 0)
         val valid: Boolean = blockchainService.isValidBlockchain(blockchain)
         Assertions.assertFalse(valid)
     }
@@ -50,7 +53,7 @@ class BlockchainServiceTest(
     @Test
     fun `given the blockchain with changed lastHash reference when call isValidBlockchain() then return false`() {
         val block = blockchain.chain[2]
-        blockchain.chain[2] = Block(block.timestamp, "broken", block.hash, block.data)
+        blockchain.chain[2] = Block(block.timestamp, "broken", block.hash, block.data, block.nonce ,block.difficulty)
         val valid: Boolean = blockchainService.isValidBlockchain(blockchain)
         Assertions.assertFalse(valid)
     }
@@ -58,7 +61,7 @@ class BlockchainServiceTest(
     @Test
     fun `given block with invalid data when call isValidBlockchain then return false`() {
         val block = blockchain.chain[2]
-        blockchain.chain[2] = Block(block.timestamp, block.lastHash, block.hash, listOf("broken"))
+        blockchain.chain[2] = Block(block.timestamp, block.lastHash, block.hash, listOf("broken"), block.nonce, block.difficulty)
         val valid: Boolean = blockchainService.isValidBlockchain(blockchain)
         Assertions.assertFalse(valid)
     }
@@ -66,7 +69,7 @@ class BlockchainServiceTest(
     @Test
     fun `given block with invalid timestamp when call isValidBlockchain then return false`() {
         val block = blockchain.chain[2]
-        blockchain.chain[2] = Block(LocalDateTime.now(), block.lastHash, block.hash, block.data)
+        blockchain.chain[2] = Block(LocalDateTime.now(), block.lastHash, block.hash, block.data, block.nonce, block.difficulty)
         val valid: Boolean = blockchainService.isValidBlockchain(blockchain)
         Assertions.assertFalse(valid)
     }
@@ -74,7 +77,7 @@ class BlockchainServiceTest(
     @Test
     fun `given block with invalid hash when call isValidBlockchain then return false`() {
         val block = blockchain.chain[2]
-        blockchain.chain[2] = Block(block.timestamp, block.lastHash, "broken", block.data)
+        blockchain.chain[2] = Block(block.timestamp, block.lastHash, "broken", block.data, block.nonce, block.difficulty)
         val valid: Boolean = blockchainService.isValidBlockchain(blockchain)
         Assertions.assertFalse(valid)
     }
@@ -82,9 +85,9 @@ class BlockchainServiceTest(
     @Test
     fun `given 2 blocks with invalid data when call isValidBlockchain then return false`() {
         val block = blockchain.chain[2]
-        blockchain.chain[2] = Block(block.timestamp, block.lastHash, block.hash, listOf("broken"))
+        blockchain.chain[2] = Block(block.timestamp, block.lastHash, block.hash, listOf("broken"), block.nonce, block.difficulty)
         val block2 = blockchain.chain[2]
-        blockchain.chain[2] = Block(block2.timestamp, block2.lastHash, block2.hash, listOf("broken"))
+        blockchain.chain[2] = Block(block2.timestamp, block2.lastHash, block2.hash, listOf("broken"), block.nonce, block.difficulty)
         val valid: Boolean = blockchainService.isValidBlockchain(blockchain)
         Assertions.assertFalse(valid)
     }
@@ -92,5 +95,66 @@ class BlockchainServiceTest(
     @Test
     fun `when call isValidBlockchain then return true`() {
         Assertions.assertTrue(blockchainService.isValidBlockchain(blockchain))
+    }
+
+    @Test
+    fun `given anotherBlockchain is not longer than current one when call replaceBlockchain then blockchain is not replaced `() {
+        blockchainService.replaceBlockchain(blockchain, anotherBlockchain)
+        Assertions.assertEquals(4, blockchain.chain.size)
+        Assertions.assertEquals("!!!", (blockchain.chain[3].data as List<*>)[0] as String)
+    }
+
+
+    @Test
+    fun `given not valid anotherBlockchain is longer than current one when call replaceBlockchain then blockchain is not replaced`() {
+        blockchainService.addBlock(anotherBlockchain, listOf("hello"))
+        blockchainService.addBlock(anotherBlockchain, listOf("world"))
+        blockchainService.addBlock(anotherBlockchain, listOf("!!!"))
+        blockchainService.addBlock(anotherBlockchain, listOf("???"))
+        val block: Block = anotherBlockchain.chain[3]
+        anotherBlockchain.chain[3] = Block(block.timestamp, block.lastHash, "fake", block.data, block.nonce, block.difficulty)
+
+        blockchainService.replaceBlockchain(blockchain, anotherBlockchain)
+        Assertions.assertEquals(4, blockchain.chain.size)
+        Assertions.assertEquals("!!!", (blockchain.chain[3].data as List<*>)[0] as String)
+    }
+
+    @Test
+    fun `given not valid anotherBlockchain is longer than current one and has wrong data in a block when call replaceBlockchain then blockchain is not replaced`() {
+        blockchainService.addBlock(anotherBlockchain, listOf("hello"))
+        blockchainService.addBlock(anotherBlockchain, listOf("world"))
+        blockchainService.addBlock(anotherBlockchain, listOf("!!!"))
+        blockchainService.addBlock(anotherBlockchain, listOf("???"))
+        val block: Block = anotherBlockchain.chain[3]
+        anotherBlockchain.chain[2] = Block(block.timestamp, block.lastHash, block.hash, listOf("fake"), block.nonce, block.difficulty)
+
+        blockchainService.replaceBlockchain(blockchain, anotherBlockchain)
+        Assertions.assertEquals(4, blockchain.chain.size)
+        Assertions.assertEquals("!!!", (blockchain.chain.last().data as List<*>)[0] as String)
+    }
+
+    @Test
+    fun `given valid anotherBlockchain is longer than current one when call replaceBlockchain then blockchain is replaced`() {
+        blockchainService.addBlock(anotherBlockchain, listOf("hello"))
+        blockchainService.addBlock(anotherBlockchain, listOf("world"))
+        blockchainService.addBlock(anotherBlockchain, listOf("!!!"))
+        blockchainService.addBlock(anotherBlockchain, listOf("???"))
+
+        blockchainService.replaceBlockchain(blockchain, anotherBlockchain)
+        Assertions.assertEquals(5, blockchain.chain.size)
+        Assertions.assertEquals("???", (blockchain.chain.last().data as List<*>)[0] as String)
+    }
+
+    @Test
+    fun `given valid anotherBlockchain is ahead than current one for 2 elements when call replaceBlockchain then blockchain is replaced`() {
+        blockchainService.addBlock(anotherBlockchain, listOf("hello"))
+        blockchainService.addBlock(anotherBlockchain, listOf("world"))
+        blockchainService.addBlock(anotherBlockchain, listOf("!!!"))
+        blockchainService.addBlock(anotherBlockchain, listOf("???"))
+        blockchainService.addBlock(anotherBlockchain, listOf("****"))
+
+        blockchainService.replaceBlockchain(blockchain, anotherBlockchain)
+        Assertions.assertEquals(6, blockchain.chain.size)
+        Assertions.assertEquals("****", (blockchain.chain.last().data as List<*>)[0] as String)
     }
 }

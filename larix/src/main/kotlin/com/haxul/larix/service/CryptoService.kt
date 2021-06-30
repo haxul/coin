@@ -22,5 +22,11 @@ class CryptoService {
     }
 
     fun cryptoHash(block: Block): String =
-        cryptoHash(block.timestamp.toString(), block.lastHash, block.data.toString())
+        cryptoHash(
+            block.timestamp.toString(),
+            block.lastHash,
+            block.data.toString(),
+            block.nonce.toString(),
+            block.difficulty.toString()
+        )
 }

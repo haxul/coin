@@ -1,6 +1,7 @@
 package com.haxul.larix.service
 
 import com.haxul.larix.common.GenesisData
+import com.haxul.larix.common.MiningConfig
 import com.haxul.larix.model.Block
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.*
@@ -17,9 +18,9 @@ class BlockServiceTest(
     val cryptoService: CryptoService
 ) {
 
-    val lastBlock: Block =
-        Block(LocalDateTime.now(), "helloworld", "world", emptyList<Any>(), GenesisData.NONCE, GenesisData.DIFFICULTY)
-    val data = listOf("Hello", "World")
+    var lastBlock: Block =
+        Block(LocalDateTime.now(), "helloworld", "world", emptyList<Any>(), GenesisData.NONCE, 3)
+    var data = listOf("Hello", "World")
 
     @Test
     fun `given lastBlock and data when call mineBlock() then return correct lastHash`() {
@@ -65,5 +66,34 @@ class BlockServiceTest(
         )
 
         assertTrue(block == Block.GENESIS_BLOCK)
+    }
+
+    @Test
+    fun `given quickly mined block when call adjustDifficulty then raise the difficulty`() {
+        val computed = blockService
+            .computeDifficulty(lastBlock, LocalDateTime.now().plusSeconds((MiningConfig.MINE_RATE + 3).toLong()))
+        assertEquals(lastBlock.difficulty - 1, computed)
+    }
+
+    @Test
+    fun `given slow mined block when call adjustDifficulty then lower the difficulty`() {
+        val computed = blockService
+            .computeDifficulty(lastBlock, LocalDateTime.now().plusNanos(50000))
+        assertEquals(lastBlock.difficulty + 1, computed)
+    }
+
+    @Test
+    fun `when call mineBlock() then returned block has correct difficulty`() {
+        val minedBlock = blockService.mineBlock(lastBlock, data)
+        val valid =
+            minedBlock.difficulty == lastBlock.difficulty + 1 || minedBlock.difficulty == lastBlock.difficulty - 1
+        assertTrue(valid)
+    }
+
+    @Test
+    fun `given block with negative difficulty when call mineBlock() then returned block has lower difficulty which equals 1`() {
+        lastBlock.difficulty = -1
+        val block: Block = blockService.mineBlock(lastBlock, data)
+        assertEquals(1, block.difficulty)
     }
 }

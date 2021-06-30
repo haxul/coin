@@ -9,7 +9,7 @@ class Block(
     val hash: String,
     val data: Any,
     val nonce: Int,
-    val difficulty:Int
+    var difficulty: Int
 ) {
     companion object {
         val GENESIS_BLOCK: Block = Block(
@@ -31,4 +31,14 @@ class Block(
             && data == other.data
             && nonce == other.nonce
             && difficulty == other.difficulty
+
+    override fun hashCode(): Int {
+        var result = timestamp.hashCode()
+        result = 31 * result + lastHash.hashCode()
+        result = 31 * result + hash.hashCode()
+        result = 31 * result + data.hashCode()
+        result = 31 * result + nonce
+        result = 31 * result + difficulty
+        return result
+    }
 }

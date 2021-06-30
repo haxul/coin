@@ -5,6 +5,8 @@ import com.haxul.larix.model.Blockchain
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.springframework.stereotype.Service
+import kotlin.concurrent.fixedRateTimer
+import kotlin.math.abs
 
 @Service
 class BlockchainService(
@@ -24,8 +26,11 @@ class BlockchainService(
         if (blockchain.chain.isEmpty()) return false
         if (blockchain.chain[0] != Block.GENESIS_BLOCK) return false
         for (idx in 1 until blockchain.chain.size) {
-            if (blockchain.chain[idx - 1].hash != blockchain.chain[idx].lastHash) return false
-            if (cryptoService.cryptoHash(blockchain.chain[idx]) != blockchain.chain[idx].hash) return false
+            val prev: Block = blockchain.chain[idx - 1]
+            val cur: Block = blockchain.chain[idx]
+            if (prev.hash != cur.lastHash) return false
+            if (cryptoService.cryptoHash(cur) != cur.hash) return false
+            if (abs(cur.difficulty - prev.difficulty) > 1) return false
         }
         return true
     }

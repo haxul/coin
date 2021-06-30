@@ -39,10 +39,10 @@ class BlockService(val cryptoService: CryptoService) {
     }
 
     fun computeDifficulty(lastBlock: Block, curTime: LocalDateTime): Int {
-        val difficulty = lastBlock.difficulty
+        val difficulty: Int = lastBlock.difficulty
         if (difficulty <= 0) return 1
-        val lastBlockEpoch = lastBlock.timestamp.toEpochSecond(ZoneOffset.UTC)
-        val curEpoch = curTime.toEpochSecond(ZoneOffset.UTC)
+        val lastBlockEpoch: Long = lastBlock.timestamp.toEpochSecond(ZoneOffset.UTC)
+        val curEpoch: Long = curTime.toEpochSecond(ZoneOffset.UTC)
         return if (lastBlockEpoch + MiningConfig.MINE_RATE > curEpoch) difficulty + 1 else difficulty - 1
     }
 }

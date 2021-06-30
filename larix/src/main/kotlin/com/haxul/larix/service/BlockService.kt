@@ -15,14 +15,13 @@ class BlockService(val cryptoService: CryptoService) {
         do {
             nonce++
             timestamp = LocalDateTime.now()
-            hash = cryptoService
-                .cryptoHash(
-                    timestamp.toString(),
-                    lastBlock.hash,
-                    data.toString(),
-                    nonce.toString(),
-                    difficulty.toString()
-                )
+            hash = cryptoService.cryptoHash(
+                timestamp.toString(),
+                lastBlock.hash,
+                data.toString(),
+                nonce.toString(),
+                difficulty.toString()
+            )
         } while (!hash.startsWith("0".repeat(difficulty)))
 
 

@@ -5,7 +5,6 @@ import com.haxul.larix.model.Blockchain
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.springframework.stereotype.Service
-import kotlin.concurrent.fixedRateTimer
 import kotlin.math.abs
 
 @Service
@@ -15,7 +14,6 @@ class BlockchainService(
 ) {
 
     val logger: Logger = LogManager.getLogger(BlockchainService::class.java)
-    val ledger:Blockchain = Blockchain()
 
     fun addBlock(blockchain: Blockchain, data: List<String>) {
         val minedBlock: Block = blockService.mineBlock(blockchain.chain.last(), data)
@@ -36,10 +34,11 @@ class BlockchainService(
         return true
     }
 
-    fun replaceBlockchain(origin: Blockchain, incoming: Blockchain) {
-        if (origin.chain.size >= incoming.chain.size) return
-        if (!isValidBlockchain(incoming)) return
+    fun replaceBlockchain(origin: Blockchain, incoming: Blockchain): Boolean {
+        if (origin.chain.size >= incoming.chain.size) return false
+        if (!isValidBlockchain(incoming)) return false
         origin.chain = incoming.chain
         logger.info("blockchain is replaced: {}", origin.chain)
+        return true
     }
 }

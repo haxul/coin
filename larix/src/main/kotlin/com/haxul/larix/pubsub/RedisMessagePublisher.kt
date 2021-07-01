@@ -13,7 +13,7 @@ class RedisMessagePublisher(
     private val gson: Gson
 ) {
 
-    fun publish(blockchain: Blockchain) {
+    fun broadcastBlockchain(blockchain: Blockchain) {
         val message: String = gson.toJson(blockchain)
         redisTemplate.convertAndSend(blockchainTopic.topic, message)
     }

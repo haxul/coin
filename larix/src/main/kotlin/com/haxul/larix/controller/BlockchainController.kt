@@ -20,12 +20,7 @@ class BlockchainController(
     @PostMapping("/blocks")
     fun addBlock(@RequestBody req: AddBlockRequest): List<Block> {
         blockchainService.addBlock(Blockchain.STORAGE, req.data)
+        redisMessagePublisher.broadcastBlockchain(Blockchain.STORAGE)
         return Blockchain.STORAGE.chain
-    }
-
-    @GetMapping("/send")
-    fun send(): String {
-        redisMessagePublisher.publish(Blockchain.STORAGE)
-        return "sent"
     }
 }

@@ -9,7 +9,7 @@ import java.time.ZoneOffset
 @Service
 class BlockService(val cryptoService: CryptoService) {
 
-    fun mineBlock(lastBlock: Block, data: Any): Block {
+    fun mineBlock(lastBlock: Block, data: List<String>): Block {
         val difficultyValue: Int = if (lastBlock.difficulty <= 1) 1 else lastBlock.difficulty
         var timestamp: LocalDateTime
         var nonce = 0

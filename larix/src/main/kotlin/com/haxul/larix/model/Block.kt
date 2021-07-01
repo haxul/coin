@@ -7,7 +7,7 @@ class Block(
     val timestamp: LocalDateTime,
     val lastHash: String,
     val hash: String,
-    val data: Any,
+    val data: List<String>,
     val nonce: Int,
     var difficulty: Int
 ) {

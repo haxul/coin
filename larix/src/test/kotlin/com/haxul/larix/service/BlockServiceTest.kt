@@ -19,7 +19,7 @@ class BlockServiceTest(
 ) {
 
     var lastBlock: Block =
-        Block(LocalDateTime.now(), "helloworld", "world", emptyList<Any>(), GenesisData.NONCE, 3)
+        Block(LocalDateTime.now(), "helloworld", "world", emptyList<String>(), GenesisData.NONCE, 3)
     var data = listOf("Hello", "World")
 
     @Test

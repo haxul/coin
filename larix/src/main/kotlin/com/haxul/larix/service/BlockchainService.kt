@@ -17,7 +17,7 @@ class BlockchainService(
     val logger: Logger = LogManager.getLogger(BlockchainService::class.java)
     val ledger:Blockchain = Blockchain()
 
-    fun addBlock(blockchain: Blockchain, data: Any) {
+    fun addBlock(blockchain: Blockchain, data: List<String>) {
         val minedBlock: Block = blockService.mineBlock(blockchain.chain.last(), data)
         blockchain.chain.add(minedBlock)
         logger.info("new block is added: {}", minedBlock)

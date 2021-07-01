@@ -19,7 +19,7 @@ class BlockchainServiceTest(
 ) {
 
     lateinit var blockchain: Blockchain
-    lateinit var data: String
+    lateinit var data: List<String>
     lateinit var anotherBlockchain: Blockchain
 
     @BeforeEach
@@ -31,7 +31,7 @@ class BlockchainServiceTest(
 
         anotherBlockchain = Blockchain()
 
-        data = "important data"
+        data = listOf("important data")
     }
 
     @Test
@@ -42,12 +42,12 @@ class BlockchainServiceTest(
     @Test
     fun `given data when call addBlock() then last blockchain block contains this data`() {
         blockchainService.addBlock(blockchain, data)
-        Assertions.assertEquals(data, blockchain.chain.last().data as String)
+        Assertions.assertEquals(data[0], blockchain.chain.last().data[0])
     }
 
     @Test
     fun `given the blockchain does not start with the genesis block when call isValidBlockchain() then returns false`() {
-        blockchain.chain[0] = Block(LocalDateTime.now(), "fake", "fake", emptyList<Any>(), 0, 0)
+        blockchain.chain[0] = Block(LocalDateTime.now(), "fake", "fake", emptyList(), 0, 0)
         val valid: Boolean = blockchainService.isValidBlockchain(blockchain)
         Assertions.assertFalse(valid)
     }
@@ -82,7 +82,7 @@ class BlockchainServiceTest(
     fun `given the chain contains a block with jumped difficulty when call isValidBlockchain then returns false`() {
         val timestamp = LocalDateTime.now()
         val lastHash: String = blockchain.chain.last().hash
-        val data: Any = listOf<Any>()
+        val data = listOf<String>()
         val nonce = 1
         val difficulty: Int = blockchain.chain.last().difficulty - 3
         val cryptoHash = cryptoService.cryptoHash(

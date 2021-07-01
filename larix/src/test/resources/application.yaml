@@ -1,2 +1,7 @@
 server:
   port: 8888
+
+app:
+  peers:
+    - http://localhost:8080
+    - http://localhost:8081

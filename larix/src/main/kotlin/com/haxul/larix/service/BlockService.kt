@@ -1,6 +1,6 @@
 package com.haxul.larix.service
 
-import com.haxul.larix.common.MiningConfig
+import com.haxul.larix.common.PeerConfig
 import com.haxul.larix.model.Block
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -43,6 +43,6 @@ class BlockService(val cryptoService: CryptoService) {
         if (difficulty <= 1) return 1
         val lastBlockEpoch: Long = lastBlock.timestamp.toEpochSecond(ZoneOffset.UTC)
         val curEpoch: Long = curTime.toEpochSecond(ZoneOffset.UTC)
-        return if (lastBlockEpoch + MiningConfig.MINE_RATE > curEpoch) difficulty + 1 else difficulty - 1
+        return if (lastBlockEpoch + PeerConfig.MINE_RATE > curEpoch) difficulty + 1 else difficulty - 1
     }
 }

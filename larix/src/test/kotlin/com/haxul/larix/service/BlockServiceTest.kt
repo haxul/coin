@@ -1,9 +1,8 @@
 package com.haxul.larix.service
 
 import com.haxul.larix.common.GenesisData
-import com.haxul.larix.common.MiningConfig
+import com.haxul.larix.common.PeerConfig
 import com.haxul.larix.model.Block
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -71,7 +70,7 @@ class BlockServiceTest(
     @Test
     fun `given quickly mined block when call adjustDifficulty then raise the difficulty`() {
         val computed = blockService
-            .computeDifficulty(lastBlock, LocalDateTime.now().plusSeconds((MiningConfig.MINE_RATE + 3).toLong()))
+            .computeDifficulty(lastBlock, LocalDateTime.now().plusSeconds((PeerConfig.MINE_RATE + 3).toLong()))
         assertEquals(lastBlock.difficulty - 1, computed)
     }
 

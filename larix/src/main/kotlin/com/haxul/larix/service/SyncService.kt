@@ -3,32 +3,44 @@ package com.haxul.larix.service
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.haxul.larix.model.Block
+import com.haxul.larix.model.Blockchain
 import com.haxul.larix.property.AppProps
 import org.springframework.context.ApplicationListener
 import org.springframework.context.event.ContextRefreshedEvent
+import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CopyOnWriteArrayList
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
 
 
 @Service
 class SyncService(
     private val appProps: AppProps,
-    private val gson: Gson
+    private val gson: Gson,
+    private val env: Environment,
+    private val restTemplate: RestTemplate
 ) : ApplicationListener<ContextRefreshedEvent> {
 
+    val logger: Logger = LogManager.getLogger(SyncService::class.java)
+    val isTestProfile: Boolean = env.activeProfiles.contains("test")
+
     override fun onApplicationEvent(event: ContextRefreshedEvent) {
-        val peers: List<String> = appProps.peers
-        val peersBlockchains = getPeersBlockchains()
-//        TODO("Not yet implemented")
+        if (isTestProfile) return
+        CompletableFuture.runAsync {
+            Blockchain.STORAGE.chain = fetchRootPeerBlocks()
+            logger.info("blockchain syncs root peer successfully")
+        }.exceptionally {
+            logger.error("Cannot sync root peer: ${it.message}")
+            null
+        }
     }
 
-    private fun getPeersBlockchains(): String? {
-        val restTemplate = RestTemplate()
-        val json = restTemplate.getForEntity("http://localhost:8081/api/blocks", String::class.java)
+    private fun fetchRootPeerBlocks(): MutableList<Block> {
+        val json = restTemplate.getForEntity("${appProps.rootPeer}/api/blocks", String::class.java)
         val listType = object : TypeToken<CopyOnWriteArrayList<Block>>() {}.type
-        val outputList: List<Block> = gson.fromJson(json.body, listType)
-        return json.body
-
+        return gson.fromJson(json.body, listType)
     }
 }

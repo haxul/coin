@@ -1,7 +1,9 @@
 server:
   port: 8888
 
+spring:
+  profiles:
+    active: test
+
 app:
-  peers:
-    - http://localhost:8080
-    - http://localhost:8081
+  rootPeer: http://localhost:8080

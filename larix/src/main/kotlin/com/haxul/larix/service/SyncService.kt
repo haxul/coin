@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.Executors
 
 @Service
 class SyncService(
@@ -25,25 +26,26 @@ class SyncService(
     private val restTemplate: RestTemplate
 ) : ApplicationListener<ContextRefreshedEvent> {
 
-    private val gson: Gson = GsonBuilder()
-        .registerTypeAdapter(LocalDateTime::class.java, GsonSyncDeserializer())
-        .create()
 
     val logger: Logger = LogManager.getLogger(SyncService::class.java)
     val isTestProfile: Boolean = env.activeProfiles.contains("test")
 
     override fun onApplicationEvent(event: ContextRefreshedEvent) {
         if (isTestProfile) return
-        CompletableFuture.runAsync {
+        val executor = Executors.newSingleThreadExecutor()
+        CompletableFuture.runAsync({
             Blockchain.STORAGE.chain = fetchRootPeerBlocks()
             logger.info("blockchain syncs root peer successfully")
-        }.exceptionally {
+        }, executor).exceptionally {
             logger.error("Cannot sync root peer: ${it.message}")
             null
         }
     }
 
     private fun fetchRootPeerBlocks(): MutableList<Block> {
+        val gson: Gson = GsonBuilder()
+            .registerTypeAdapter(LocalDateTime::class.java, GsonSyncDeserializer())
+            .create()
         val json = restTemplate.getForEntity("${appProps.rootPeer}/api/blocks", String::class.java)
         val listType = object : TypeToken<CopyOnWriteArrayList<Block>>() {}.type
         return gson.fromJson(json.body, listType)

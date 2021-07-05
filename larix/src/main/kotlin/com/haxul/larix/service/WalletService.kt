@@ -2,14 +2,20 @@ package com.haxul.larix.service
 
 import com.haxul.larix.model.Wallet
 import org.springframework.stereotype.Service
-import org.web3j.crypto.ECKeyPair
-import org.web3j.crypto.Keys
+import org.web3j.crypto.Hash
+import org.web3j.crypto.Sign
+
 
 @Service
 class WalletService {
 
-    fun createNewWallet(): Wallet {
-        val keyPair: ECKeyPair = Keys.createEcKeyPair()
-        return Wallet(keyPair, keyPair.publicKey.toString(16))
+    fun verifySignature(pubKey: String, msg: String, signature: Sign.SignatureData): Boolean {
+        val pubKeyRecovered = Sign.signedMessageToKey(msg.toByteArray(), signature)
+        return pubKey == pubKeyRecovered.toString(16)
+    }
+
+    fun sign(msg: String, wallet: Wallet): Sign.SignatureData {
+        val msgHash = Hash.sha3(msg.toByteArray())
+        return Sign.signMessage(msgHash, wallet.keyPair, false)
     }
 }

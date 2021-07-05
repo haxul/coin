@@ -38,7 +38,6 @@ class WalletServiceTest(
 
         val badMsg = listOf("hello", "world", "fake").toString()
         val valid: Boolean = walletService.verifySignature(wallet.publicKey, badMsg, signature)
-
         Assertions.assertFalse(valid)
     }
 
@@ -47,7 +46,6 @@ class WalletServiceTest(
         val msg: String = listOf("hello", "world").toString()
         val anotherWallet = Wallet()
         val wrongSignature: Sign.SignatureData = walletService.sign(msg, anotherWallet)
-
         val valid: Boolean = walletService.verifySignature(wallet.publicKey, msg, wrongSignature)
 
         Assertions.assertFalse(valid)

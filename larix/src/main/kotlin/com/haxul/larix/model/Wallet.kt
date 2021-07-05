@@ -5,8 +5,8 @@ import org.web3j.crypto.ECKeyPair
 import org.web3j.crypto.Keys
 import java.math.BigDecimal
 
-data class Wallet(
-    val keyPair: ECKeyPair = Keys.createEcKeyPair(),
-    val publicKey: String = keyPair.publicKey.toString(16),
+class Wallet {
+    val keyPair: ECKeyPair = Keys.createEcKeyPair()
+    val publicKey: String = keyPair.publicKey.toString(16)
     var balance: BigDecimal = WalletConfig.STARTING_BALANCE
-)
+}

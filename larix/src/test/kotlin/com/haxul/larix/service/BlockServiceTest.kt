@@ -9,13 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import java.time.LocalDateTime
 
-@SpringBootTest
-class BlockServiceTest(
-    @Autowired
-    val blockService: BlockService,
-    @Autowired
-    val cryptoService: CryptoService
-) {
+class BlockServiceTest {
+    private val cryptoService = CryptoService()
+    private val blockService = BlockService(cryptoService)
 
     var lastBlock: Block =
         Block(LocalDateTime.now(), "helloworld", "world", emptyList<String>(), GenesisData.NONCE, 3)

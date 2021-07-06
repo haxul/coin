@@ -23,4 +23,18 @@ class BlockchainController(
         redisMessagePublisher.broadcastBlockchain(Blockchain.STORAGE)
         return Blockchain.STORAGE.chain
     }
+
+//    @GetMapping("/test")
+//    fun get(@RequestBody s: Any): Sign.SignatureData {
+//        println(s)
+//
+//        val linkedHashMap = s as LinkedHashMap<*, *>
+//        val signatureData = Sign.SignatureData(
+//            (linkedHashMap.get("v") as Int).toByte(), linkedHashMap.get("r").toString().toByteArray(),
+//            linkedHashMap.get("s").toString().toByteArray()
+//        )
+////        val walletService = WalletService()
+////        val sign: Sign.SignatureData = walletService.sign("hello", Wallet())
+//        return sign
+//    }
 }

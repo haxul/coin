@@ -1,16 +1,10 @@
 package com.haxul.larix.service
 
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 
-@SpringBootTest
-class CryptoServiceTest(
-    @Autowired
-    val cryptoService: CryptoService
-) {
+class CryptoServiceTest {
+    private val cryptoService = CryptoService()
 
     @Test
     fun `when call cryptoHash() then return string of hash`() {

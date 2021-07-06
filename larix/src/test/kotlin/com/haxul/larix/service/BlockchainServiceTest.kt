@@ -10,14 +10,11 @@ import org.springframework.boot.test.context.SpringBootTest
 import java.time.LocalDateTime
 
 
-@SpringBootTest
-class BlockchainServiceTest(
-    @Autowired
-    val blockchainService: BlockchainService,
-    @Autowired
-    val cryptoService: CryptoService
-) {
+class BlockchainServiceTest {
 
+    private val cryptoService = CryptoService()
+    private val blockService = BlockService(cryptoService)
+    private val blockchainService = BlockchainService(blockService, cryptoService)
     lateinit var blockchain: Blockchain
     lateinit var data: List<String>
     lateinit var anotherBlockchain: Blockchain

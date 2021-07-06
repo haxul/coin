@@ -4,10 +4,10 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.*
 
-data class Transaction(
-    val senderWallet: Wallet,
-    val recipient: String,
-    val amount: BigDecimal
+class Transaction(
+    senderWallet: Wallet,
+    recipient: String,
+    amount: BigDecimal
 ) {
     val txId: String = UUID.randomUUID().toString()
 

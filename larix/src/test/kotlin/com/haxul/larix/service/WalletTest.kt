@@ -3,8 +3,6 @@ package com.haxul.larix.service
 import com.haxul.larix.model.Wallet
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 import org.web3j.crypto.Sign
 
 class WalletTest {

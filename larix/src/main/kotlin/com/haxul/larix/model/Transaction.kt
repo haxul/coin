@@ -11,12 +11,12 @@ class Transaction(
 ) {
     val txId: String = UUID.randomUUID().toString()
 
-    val outputMap: Map<String, BigDecimal> = mapOf(
+    val outputMap: MutableMap<String, BigDecimal?> = mutableMapOf(
         recipient to amount,
         senderWallet.publicKey to senderWallet.balance.minus(amount)
     )
 
-    var inputMap: Map<String, Any> = mapOf(
+    var inputMap: MutableMap<String, Any> = mutableMapOf(
         "timestamp" to LocalDateTime.now(),
         "amount" to senderWallet.balance,
         "address" to senderWallet.publicKey,

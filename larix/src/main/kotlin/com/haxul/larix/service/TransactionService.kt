@@ -7,7 +7,6 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.springframework.stereotype.Service
 import org.web3j.crypto.Sign
-import java.lang.RuntimeException
 import java.math.BigDecimal
 
 @Service
@@ -23,7 +22,7 @@ class TransactionService(
     }
 
     fun isTxValid(tx: Transaction): Boolean {
-        val outputTotal: BigDecimal = tx.outputMap.values.reduce { total, outputAmount -> total.add(outputAmount) }
+        val outputTotal: BigDecimal? = tx.outputMap.values.reduce { total, outputAmount -> total?.add(outputAmount) }
         if (outputTotal != tx.inputMap["amount"]) {
             logger.error("invalid tx: ${tx.txId}")
             return false
@@ -40,5 +39,11 @@ class TransactionService(
         }
 
         return true
+    }
+
+    fun updateTx(senderWallet: Wallet, recipient: String, amount: BigDecimal, tx: Transaction) {
+        tx.outputMap[recipient] = amount
+        tx.outputMap[senderWallet.publicKey] = tx.outputMap[senderWallet.publicKey]?.minus(amount)
+        tx.inputMap["signature"] = senderWallet.sign(tx.outputMap.toString())
     }
 }

@@ -16,12 +16,15 @@ class TransactionServiceTest {
     private lateinit var senderWallet: Wallet
     private lateinit var tx: Transaction
 
+    private val recipientAddress = "recipientAddress"
+    private val recipientAmount = BigDecimal(50)
+
     @BeforeEach
     fun beforeEach() {
         senderWallet = Wallet()
         tx = Transaction(
-            amount = BigDecimal("50"),
-            recipient = "recipientAddress",
+            amount = recipientAmount,
+            recipient = recipientAddress,
             senderWallet = senderWallet
         )
     }
@@ -91,5 +94,18 @@ class TransactionServiceTest {
         transactionService.updateTx(senderWallet, "no matter", newAmount, tx)
 
         Assertions.assertNotEquals(originSignature, tx.inputMap["signature"] as Sign.SignatureData)
+    }
+
+    @Test
+    fun `given amount exceeds wallet balance when call updateTx then throws exception`() {
+        Assertions.assertThrows(ExceedWalletBalanceTxException::class.java)
+        { transactionService.updateTx(senderWallet, "no matter", BigDecimal(9999999999), tx) }
+    }
+
+    @Test
+    fun `given two recipient with the same address when call update tx then outMap should increase its money`() {
+        val newAmount = BigDecimal(100)
+        transactionService.updateTx(senderWallet, recipientAddress, newAmount, tx)
+        assertEquals(newAmount + recipientAmount, tx.outputMap[recipientAddress])
     }
 }

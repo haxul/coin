@@ -42,8 +42,15 @@ class TransactionService(
     }
 
     fun updateTx(senderWallet: Wallet, recipient: String, amount: BigDecimal, tx: Transaction) {
-        tx.outputMap[recipient] = amount
+        val curRecipientAmount: BigDecimal = tx.outputMap[recipient] ?: BigDecimal.ZERO
+        tx.outputMap[recipient] = curRecipientAmount + amount
         tx.outputMap[senderWallet.publicKey] = tx.outputMap[senderWallet.publicKey]?.minus(amount)
+
+        val total: BigDecimal? = tx.outputMap.values.reduce { acc, el -> acc?.add(el) }
+        total?.let {
+            tx.outputMap[senderWallet.publicKey]
+                ?.let { if (it < BigDecimal.ZERO) throw ExceedWalletBalanceTxException("not enough money in the wallet") }
+        }
         tx.inputMap["signature"] = senderWallet.sign(tx.outputMap.toString())
     }
 }

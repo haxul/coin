@@ -16,4 +16,8 @@ class Wallet {
         val msgHash = Hash.sha3(msg.toByteArray())
         return Sign.signMessage(msgHash, keyPair, false)
     }
+
+    companion object {
+        val NODE_WALLET = Wallet()
+    }
 }

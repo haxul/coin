@@ -1,17 +1,19 @@
 package com.haxul.larix.controller
 
 import com.haxul.larix.controller.dto.AddBlockRequest
-import com.haxul.larix.model.Block
-import com.haxul.larix.model.Blockchain
+import com.haxul.larix.controller.dto.TransactCreateRequest
+import com.haxul.larix.model.*
 import com.haxul.larix.pubsub.RedisMessagePublisher
 import com.haxul.larix.service.BlockchainService
+import com.haxul.larix.service.TransactionService
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api")
 class BlockchainController(
     private val blockchainService: BlockchainService,
-    private val redisMessagePublisher: RedisMessagePublisher
+    private val redisMessagePublisher: RedisMessagePublisher,
+    private val transactionService: TransactionService
 ) {
 
     @GetMapping("/blocks")
@@ -22,6 +24,17 @@ class BlockchainController(
         blockchainService.addBlock(Blockchain.STORAGE, req.data)
         redisMessagePublisher.broadcastBlockchain(Blockchain.STORAGE)
         return Blockchain.STORAGE.chain
+    }
+
+    @PostMapping("/transact")
+    fun transact(@RequestBody req: TransactCreateRequest): Transaction {
+        val tx: Transaction = transactionService.createTx(
+            recipient = req.recipient,
+            amount = req.amount,
+            wallet = Wallet.NODE_WALLET
+        )
+        TransactionPool.setTx(tx)
+        return tx
     }
 
 //    @GetMapping("/test")

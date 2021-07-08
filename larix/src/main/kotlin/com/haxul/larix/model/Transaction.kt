@@ -28,6 +28,13 @@ class Transaction(
 
     override fun hashCode(): Int = txId.hashCode()
 
+    override fun toString() = """
+        id: $txId,
+        outputMap: $outputMap,
+        inputMap: $inputMap
+    """.trimIndent()
+
+
 }
 
 

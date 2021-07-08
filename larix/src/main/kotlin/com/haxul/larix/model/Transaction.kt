@@ -7,9 +7,12 @@ import java.util.*
 class Transaction(
     senderWallet: Wallet,
     recipient: String,
-    amount: BigDecimal
-) {
+    amount: BigDecimal,
     val txId: String = UUID.randomUUID().toString()
+) {
+    companion object {
+        fun getEmptyTxWithId(id: String) = Transaction(Wallet.NODE_WALLET, "", BigDecimal.ZERO, id)
+    }
 
     val outputMap: MutableMap<String, BigDecimal?> = mutableMapOf(
         recipient to amount,

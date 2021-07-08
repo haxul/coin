@@ -1,6 +1,8 @@
 package com.haxul.larix.config
 
-import com.haxul.larix.pubsub.RedisMessageSubscriber
+import com.haxul.larix.pubsub.RedisMessageBlockchainSubscriber
+import com.haxul.larix.pubsub.RedisMessageTransactionSubscriber
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.redis.connection.RedisConnectionFactory
@@ -13,24 +15,35 @@ import org.springframework.data.redis.serializer.GenericToStringSerializer
 
 @Configuration
 class RedisConfig(
-    private val redisMessageSubscriber: RedisMessageSubscriber
+    private val redisMessageBlockchainSubscriber: RedisMessageBlockchainSubscriber,
+    private val redisMessageTransactionSubscriber: RedisMessageTransactionSubscriber
 ) {
     @Bean
     fun container(
         redisConnectionFactory: RedisConnectionFactory,
-        messageListenerAdapter: MessageListenerAdapter
+        @Qualifier("messageBlockchainListenerAdapter") blockchainListerAdapter: MessageListenerAdapter,
+        @Qualifier("messageTransactionListenerAdapter") txListenerAdapter: MessageListenerAdapter
     ): RedisMessageListenerContainer {
         val redisMessageListenerContainer = RedisMessageListenerContainer()
         redisMessageListenerContainer.setConnectionFactory(redisConnectionFactory)
-        redisMessageListenerContainer.addMessageListener(messageListenerAdapter, blockchainTopic())
+        redisMessageListenerContainer.addMessageListener(blockchainListerAdapter, blockchainTopic())
+        redisMessageListenerContainer.addMessageListener(txListenerAdapter, transactionTopic())
         return redisMessageListenerContainer
     }
 
     @Bean
-    fun messageListenerAdapter(): MessageListenerAdapter = MessageListenerAdapter(redisMessageSubscriber, "onMessage")
+    fun messageBlockchainListenerAdapter(): MessageListenerAdapter =
+        MessageListenerAdapter(redisMessageBlockchainSubscriber, "onMessage")
+
+    @Bean
+    fun messageTransactionListenerAdapter(): MessageListenerAdapter =
+        MessageListenerAdapter(redisMessageTransactionSubscriber, "onMessage")
 
     @Bean
     fun blockchainTopic(): ChannelTopic = ChannelTopic("BLOCKCHAIN")
+
+    @Bean
+    fun transactionTopic(): ChannelTopic = ChannelTopic("TRANSACTION")
 
     @Bean
     fun redisTemplate(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, Any> {

@@ -13,12 +13,12 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
 @Component
-class RedisMessageSubscriber(
+class RedisMessageBlockchainSubscriber(
     private val gson: Gson,
     private val blockchainService: BlockchainService
 ) : MessageListener {
 
-    val logger: Logger = LogManager.getLogger(RedisMessageSubscriber::class.java)
+    val logger: Logger = LogManager.getLogger(RedisMessageBlockchainSubscriber::class.java)
 
     override fun onMessage(message: Message, pattern: ByteArray?) {
         val incomingMessage: ChainBroadCastMessage =

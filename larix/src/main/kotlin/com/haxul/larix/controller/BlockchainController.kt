@@ -7,6 +7,7 @@ import com.haxul.larix.pubsub.RedisMessagePublisher
 import com.haxul.larix.service.BlockchainService
 import com.haxul.larix.service.TransactionService
 import org.springframework.web.bind.annotation.*
+import java.math.BigDecimal
 
 @RestController
 @RequestMapping("/api")
@@ -31,27 +32,15 @@ class BlockchainController(
         val existingTx: Transaction? = TransactionPool.existingTx(Wallet.NODE_WALLET.publicKey)
         existingTx?.let {
             transactionService.updateTx(Wallet.NODE_WALLET, req.recipient, req.amount, existingTx)
+            redisMessagePublisher.broadcastTransaction(existingTx)
             return existingTx
         }
         val newTx: Transaction = transactionService.createTx(req.amount, req.recipient, Wallet.NODE_WALLET)
         TransactionPool.add(newTx)
+        redisMessagePublisher.broadcastTransaction(newTx)
         return newTx
     }
 
     @GetMapping("/tx-pool")
     fun getTxPool(): MutableCollection<Transaction> = TransactionPool.txMap.values
-
-//    @GetMapping("/test")
-//    fun get(@RequestBody s: Any): Sign.SignatureData {
-//        println(s)
-//
-//        val linkedHashMap = s as LinkedHashMap<*, *>
-//        val signatureData = Sign.SignatureData(
-//            (linkedHashMap.get("v") as Int).toByte(), linkedHashMap.get("r").toString().toByteArray(),
-//            linkedHashMap.get("s").toString().toByteArray()
-//        )
-////        val walletService = WalletService()
-////        val sign: Sign.SignatureData = walletService.sign("hello", Wallet())
-//        return sign
-//    }
 }

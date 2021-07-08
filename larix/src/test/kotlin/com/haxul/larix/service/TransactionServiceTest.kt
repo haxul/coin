@@ -92,7 +92,6 @@ class TransactionServiceTest {
         val originSignature: Sign.SignatureData = tx.inputMap["signature"] as Sign.SignatureData
         val newAmount = BigDecimal(100)
         transactionService.updateTx(senderWallet, "no matter", newAmount, tx)
-
         Assertions.assertNotEquals(originSignature, tx.inputMap["signature"] as Sign.SignatureData)
     }
 

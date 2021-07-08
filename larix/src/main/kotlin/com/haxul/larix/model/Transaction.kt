@@ -22,6 +22,12 @@ class Transaction(
         "address" to senderWallet.publicKey,
         "signature" to senderWallet.sign(outputMap.toString())
     )
+
+    override fun equals(other: Any?) = (other is Transaction)
+            && txId == other.txId
+
+    override fun hashCode(): Int = txId.hashCode()
+
 }
 
 

@@ -19,8 +19,8 @@ class TransactionPoolTest {
 
     @Test
     fun `when call transaction pool setTx then tx is placed in transaction pool`() {
-        TransactionPool.setTx(tx)
+        TransactionPool.add(tx)
 
-        Assertions.assertEquals(tx, TransactionPool.getTx(tx.txId))
+        Assertions.assertEquals(tx, TransactionPool.find(tx.txId))
     }
 }

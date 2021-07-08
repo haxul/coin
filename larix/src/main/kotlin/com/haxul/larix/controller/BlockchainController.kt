@@ -28,14 +28,18 @@ class BlockchainController(
 
     @PostMapping("/transact")
     fun transact(@RequestBody req: TransactCreateRequest): Transaction {
-        val tx: Transaction = transactionService.createTx(
-            recipient = req.recipient,
-            amount = req.amount,
-            wallet = Wallet.NODE_WALLET
-        )
-        TransactionPool.setTx(tx)
-        return tx
+        val existingTx: Transaction? = TransactionPool.existingTx(Wallet.NODE_WALLET.publicKey)
+        existingTx?.let {
+            transactionService.updateTx(Wallet.NODE_WALLET, req.recipient, req.amount, existingTx)
+            return existingTx
+        }
+        val newTx: Transaction = transactionService.createTx(req.amount, req.recipient, Wallet.NODE_WALLET)
+        TransactionPool.add(newTx)
+        return newTx
     }
+
+    @GetMapping("/tx-pool")
+    fun getTxPool(): MutableCollection<Transaction> = TransactionPool.txMap.values
 
 //    @GetMapping("/test")
 //    fun get(@RequestBody s: Any): Sign.SignatureData {

@@ -3,9 +3,7 @@ package com.haxul.larix.service
 import com.haxul.larix.model.Transaction
 import com.haxul.larix.model.Wallet
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.web3j.crypto.Sign
 import java.math.BigDecimal
 
 

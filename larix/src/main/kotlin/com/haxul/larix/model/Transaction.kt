@@ -1,6 +1,8 @@
 package com.haxul.larix.model
 
+import org.web3j.crypto.ECKeyPair
 import java.math.BigDecimal
+import java.math.BigInteger
 import java.time.LocalDateTime
 import java.util.*
 
@@ -11,7 +13,14 @@ class Transaction(
     val txId: String = UUID.randomUUID().toString()
 ) {
     companion object {
-        fun getEmptyTxWithId(id: String) = Transaction(Wallet.NODE_WALLET, "", BigDecimal.ZERO, id)
+        fun getEmptyTxWithId(id: String): Transaction {
+            val fakeKeyPair = ECKeyPair(BigInteger.ZERO, BigInteger.ZERO)
+            val fakeWallet = Wallet(fakeKeyPair)
+            val tx = Transaction(fakeWallet, "fake", BigDecimal.ZERO, id)
+            tx.inputMap.clear()
+            tx.outputMap.clear()
+            return tx
+        }
     }
 
     val outputMap: MutableMap<String, BigDecimal?> = mutableMapOf(
@@ -19,7 +28,7 @@ class Transaction(
         senderWallet.publicKey to senderWallet.balance.minus(amount)
     )
 
-    var inputMap: MutableMap<String, Any> = mutableMapOf(
+    val inputMap: MutableMap<String, Any> = mutableMapOf(
         "timestamp" to LocalDateTime.now(),
         "amount" to senderWallet.balance,
         "address" to senderWallet.publicKey,

@@ -16,7 +16,7 @@ import java.time.LocalDateTime
 
 @Component
 class RedisMessageTransactionSubscriber(
-    private val gson: Gson,
+    private val gson: Gson
 ) : MessageListener {
 
     val logger: Logger = LogManager.getLogger(RedisMessageTransactionSubscriber::class.java)
@@ -28,24 +28,23 @@ class RedisMessageTransactionSubscriber(
         logger.info("incoming tx '${incomingTx.txId}' is added the tx pool")
     }
 
-
-    // TODO write tests and refactor
-    fun convertMessageToTx(msg: LinkedHashMap<*, *>): Transaction {
-
+    private fun convertMessageToTx(msg: LinkedHashMap<*, *>): Transaction {
+        // get id
         val txId = msg["txId"] as String
+
+        //crete empty tx
         val tx: Transaction = Transaction.getEmptyTxWithId(txId)
-        tx.outputMap.clear()
-        tx.inputMap.clear()
 
-        val rawOutputMap = msg["outputMap"] as LinkedTreeMap<*, *>
-        rawOutputMap.forEach {
-            tx.outputMap[it.key as String] = BigDecimal(it.value as Double)
-        }
+        // form outputMap for the tx
+        (msg["outputMap"] as LinkedTreeMap<*, *>)
+            .forEach { tx.outputMap[it.key as String] = BigDecimal(it.value as Double) }
 
-        val rim = msg["inputMap"] as LinkedTreeMap<*, *>
-        val dateMap = (rim["timestamp"] as LinkedTreeMap<*, *>)["date"] as LinkedTreeMap<*, *>
-        val timeMap = (rim["timestamp"] as LinkedTreeMap<*, *>)["time"] as LinkedTreeMap<*, *>
+        // form inputMap
+        val im = msg["inputMap"] as LinkedTreeMap<*, *>
 
+        // form timestamp
+        val dateMap = (im["timestamp"] as LinkedTreeMap<*, *>)["date"] as LinkedTreeMap<*, *>
+        val timeMap = (im["timestamp"] as LinkedTreeMap<*, *>)["time"] as LinkedTreeMap<*, *>
         tx.inputMap["timestamp"] = LocalDateTime.of(
             (dateMap["year"] as Double).toInt(),
             (dateMap["month"] as Double).toInt(),
@@ -55,25 +54,23 @@ class RedisMessageTransactionSubscriber(
             (timeMap["second"] as Double).toInt(),
         )
 
-        tx.inputMap["amount"] = BigDecimal(rim["amount"] as Double)
-        tx.inputMap["address"] = rim["address"] as String
+        // get amount
+        tx.inputMap["amount"] = BigDecimal(im["amount"] as Double)
+        // get address
+        tx.inputMap["address"] = im["address"] as String
 
+        // form signature
+        val signatureMap = im["signature"] as LinkedTreeMap<*, *>
 
-        val signatureMap = rim["signature"] as LinkedTreeMap<*, *>
-        val v: Byte = (signatureMap.get("v") as Double).toInt().toByte()
-        val rrList: List<Byte> = (signatureMap.get("r") as ArrayList<*>).map { (it as Double).toInt().toByte() }
-        val r = ByteArray(rrList.size)
-        for ((i, e) in rrList.withIndex()) {
-            r[i] = e
-        }
-        val rsList: List<Byte> = (signatureMap.get("s") as ArrayList<*>).map { (it as Double).toInt().toByte() }
-        val s = ByteArray(rsList.size)
-        for ((i, e) in rsList.withIndex()) {
-            s[i] = e
-        }
-        val signatureData = Sign.SignatureData(
-            v, r, s
-        )
+        val v: Byte = (signatureMap["v"] as Double).toInt().toByte()
+        val r: ByteArray = (signatureMap["r"] as ArrayList<*>)
+            .map { (it as Double).toInt().toByte() }
+            .toByteArray()
+        val s: ByteArray = (signatureMap["s"] as ArrayList<*>)
+            .map { (it as Double).toInt().toByte() }
+            .toByteArray()
+
+        val signatureData = Sign.SignatureData(v, r, s)
         tx.inputMap["signature"] = signatureData
 
         return tx

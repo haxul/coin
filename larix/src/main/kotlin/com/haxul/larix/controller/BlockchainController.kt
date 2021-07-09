@@ -42,5 +42,5 @@ class BlockchainController(
     }
 
     @GetMapping("/tx-pool")
-    fun getTxPool(): MutableCollection<Transaction> = TransactionPool.txMap.values
+    fun getTxPool() = TransactionPool.txMap
 }

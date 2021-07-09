@@ -1,7 +1,7 @@
 package com.haxul.larix.model
 
 object TransactionPool {
-    val txMap: MutableMap<String, Transaction> = mutableMapOf()
+    var txMap: MutableMap<String, Transaction> = mutableMapOf()
 
     fun add(tx: Transaction) {
         txMap[tx.txId] = tx

@@ -4,7 +4,6 @@ import com.google.gson.Gson
 import com.google.gson.internal.LinkedTreeMap
 import com.haxul.larix.model.Transaction
 import com.haxul.larix.model.TransactionPool
-import com.haxul.larix.service.TransactionService
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.springframework.data.redis.connection.Message
@@ -16,31 +15,32 @@ import java.time.LocalDateTime
 
 @Component
 class RedisMessageTransactionSubscriber(
-    private val gson: Gson
+    private val gson: Gson,
 ) : MessageListener {
 
-    val logger: Logger = LogManager.getLogger(RedisMessageTransactionSubscriber::class.java)
+    private val logger: Logger = LogManager.getLogger(RedisMessageTransactionSubscriber::class.java)
 
     override fun onMessage(message: Message, pattern: ByteArray?) {
         val msg: LinkedHashMap<*, *> = gson.fromJson(message.toString(), LinkedHashMap::class.java)
-        val incomingTx = convertMessageToTx(msg)
+        val incomingTx = convertJsonTx(msg)
         TransactionPool.add(incomingTx)
         logger.info("incoming tx '${incomingTx.txId}' is added the tx pool")
     }
 
-    private fun convertMessageToTx(msg: LinkedHashMap<*, *>): Transaction {
+
+    private fun convertJsonTx(jsonTx: LinkedHashMap<*, *>): Transaction {
         // get id
-        val txId = msg["txId"] as String
+        val txId = jsonTx["txId"] as String
 
         //crete empty tx
         val tx: Transaction = Transaction.getEmptyTxWithId(txId)
 
         // form outputMap for the tx
-        (msg["outputMap"] as LinkedTreeMap<*, *>)
+        (jsonTx["outputMap"] as LinkedTreeMap<*, *>)
             .forEach { tx.outputMap[it.key as String] = BigDecimal(it.value as Double) }
 
         // form inputMap
-        val im = msg["inputMap"] as LinkedTreeMap<*, *>
+        val im = jsonTx["inputMap"] as LinkedTreeMap<*, *>
 
         // form timestamp
         val dateMap = (im["timestamp"] as LinkedTreeMap<*, *>)["date"] as LinkedTreeMap<*, *>

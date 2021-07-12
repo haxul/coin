@@ -16,4 +16,7 @@ object TransactionPool {
         }
         return null
     }
+
+    fun clear() = txMap.clear()
+
 }

@@ -1,7 +1,9 @@
 package com.haxul.larix.service
 
+import com.haxul.larix.common.MiningConfig
 import com.haxul.larix.exception.ExceedWalletBalanceTxException
 import com.haxul.larix.model.Transaction
+import com.haxul.larix.model.TransactionPool
 import com.haxul.larix.model.Wallet
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -19,6 +21,8 @@ class TransactionServiceTest {
     private val recipientAddress = "recipientAddress"
     private val recipientAmount = BigDecimal(50)
 
+    private lateinit var validTxs: MutableList<Transaction>
+
     @BeforeEach
     fun beforeEach() {
         senderWallet = Wallet()
@@ -27,6 +31,22 @@ class TransactionServiceTest {
             recipient = recipientAddress,
             senderWallet = senderWallet
         )
+
+        TransactionPool.txMap.clear()
+        validTxs = mutableListOf()
+        for (i in 1 until 30) {
+            val tx = Transaction(senderWallet, "any-recipient", BigDecimal(30))
+            if (i % 3 == 0) tx.inputMap["amount"] = BigDecimal(9999999)
+            else validTxs.add(tx)
+            TransactionPool.add(tx)
+        }
+    }
+
+
+    @Test
+    fun `when call getValidTxs then return valid txs`() {
+        val validTxsFromPool = transactionService.getValidTxsFromPool()
+        assertEquals(validTxs.size, validTxsFromPool.size)
     }
 
     @Test
@@ -106,5 +126,13 @@ class TransactionServiceTest {
         val newAmount = BigDecimal(100)
         transactionService.updateTx(senderWallet, recipientAddress, newAmount, tx)
         assertEquals(newAmount + recipientAmount, tx.outputMap[recipientAddress])
+    }
+
+    @Test
+    fun `when call createRewardTx then return tx to reward a miner`() {
+        val minerWallet = Wallet()
+        val rewardTx: Transaction = transactionService.createRewardTx(minerWallet)
+        assertEquals(rewardTx.inputMap["address"], MiningConfig.REWARD_BLOCKCHAIN_ADDRESS)
+        assertEquals(MiningConfig.MINING_REWARD, rewardTx.outputMap[minerWallet.publicKey])
     }
 }

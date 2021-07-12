@@ -1,13 +1,16 @@
 package com.haxul.larix.service
 
+import com.haxul.larix.common.MiningConfig
 import com.haxul.larix.exception.ExceedWalletBalanceTxException
 import com.haxul.larix.model.Transaction
+import com.haxul.larix.model.TransactionPool
 import com.haxul.larix.model.Wallet
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.springframework.stereotype.Service
 import org.web3j.crypto.Sign
 import java.math.BigDecimal
+import java.util.*
 
 @Service
 class TransactionService(
@@ -53,4 +56,15 @@ class TransactionService(
         }
         tx.inputMap["signature"] = senderWallet.sign(tx.outputMap.toString())
     }
+
+    fun getValidTxsFromPool(): List<Transaction> = TransactionPool.txMap.values.filter { isTxValid(it) }
+
+    fun createRewardTx(minerWallet: Wallet): Transaction {
+        val tx: Transaction = Transaction.getEmptyTxWithId(UUID.randomUUID().toString())
+        tx.inputMap["address"] = MiningConfig.REWARD_BLOCKCHAIN_ADDRESS
+        tx.outputMap[minerWallet.publicKey] = MiningConfig.MINING_REWARD
+        return tx
+    }
+
+
 }
